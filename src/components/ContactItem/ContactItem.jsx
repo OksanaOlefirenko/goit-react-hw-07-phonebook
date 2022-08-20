@@ -1,14 +1,21 @@
 import { Item, Button } from './ContactItem.styled';
 import PropTypes from 'prop-types';
+import { useDeleteContactMutation } from 'redux/contactsApi';
+import { Loader } from 'components/Loader';
 
-export const ContactItem = ({ id, name, number, onDelete }) => {
+export const ContactItem = ({ id, name, number }) => {
+  const [deleteContact, { isLoading: isDeleting }] = useDeleteContactMutation();
   return (
     <Item key={id}>
       <p>
         {name}: {number}
       </p>
-      <Button type="button" onClick={() => onDelete(id)}>
-        Delete
+      <Button
+        type="button"
+        onClick={() => deleteContact(id)}
+        disabled={isDeleting}
+      >
+        {isDeleting && <Loader size={12} />} Delete
       </Button>
     </Item>
   );

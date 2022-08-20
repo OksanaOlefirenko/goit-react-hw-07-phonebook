@@ -1,15 +1,18 @@
 import { Form, Label, Input, Button } from './ContactForm.styled';
 import { nanoid } from 'nanoid';
-import { useDispatch, useSelector } from 'react-redux';
+// import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
-import { add, getContacts } from 'redux/contactsSlice';
+import { useCreateContactMutation } from 'redux/contactsApi';
+import { Loader } from 'components/Loader';
+import { toast } from 'react-hot-toast';
 
 export const ContactForm = () => {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
 
-  const dispatch = useDispatch();
-  const contacts = useSelector(getContacts);
+  // const dispatch = useDispatch();
+  // const contacts = useSelector(getContacts);
+  const [createContact, { isLoading }] = useCreateContactMutation();
 
   const handleChange = e => {
     const { name, value } = e.currentTarget;
@@ -28,20 +31,21 @@ export const ContactForm = () => {
   const handleSubmit = e => {
     e.preventDefault();
     const contact = { id: nanoid(), name, number };
-    const findName = contacts.find(
-      contact => contact.name.toLowerCase() === name.toLowerCase()
-    );
+    // const findName = contacts.find(
+    //   contact => contact.name.toLowerCase() === name.toLowerCase()
+    // );
 
-    if (findName) {
-      return alert(`${name} is already in contacts.`);
-    }
-    const findNumber = contacts.find(contact => contact.number === number);
-    if (findNumber) {
-      return alert(`This phone number is already in contacts.`);
-    }
-    dispatch(add(contact));
+    // if (findName) {
+    //   return alert(`${name} is already in contacts.`);
+    // }
+    // const findNumber = contacts.find(contact => contact.number === number);
+    // if (findNumber) {
+    //   return alert(`This phone number is already in contacts.`);
+    // }
+    createContact(contact);
     setName('');
     setNumber('');
+    toast.success('Сontact added');
   };
 
   return (
@@ -71,7 +75,9 @@ export const ContactForm = () => {
           required
         />
       </Label>
-      <Button type="submit">Add contact</Button>
+      <Button type="submit" disabled={isLoading}>
+        {isLoading && <Loader size={12} />} Add contact
+      </Button>
     </Form>
   );
 };
