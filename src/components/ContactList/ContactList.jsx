@@ -4,17 +4,20 @@ import { useSelector } from 'react-redux';
 import { getFilter } from 'redux/contactsSlice';
 import { useGetContactsQuery } from 'redux/contactsApi';
 import { Loader } from 'components/Loader';
+import { useMemo } from 'react';
 
 export const ContactList = () => {
   const { data: contacts, error, isLoading } = useGetContactsQuery();
 
   const filterContact = useSelector(getFilter);
 
-  const visibleContacts = filterContact
-    ? contacts.filter(({ name }) =>
+  const visibleContacts = useMemo(() => {
+    return (
+      contacts?.filter(({ name }) =>
         name.toLowerCase().includes(filterContact.toLowerCase())
-      )
-    : contacts;
+      ) ?? []
+    );
+  }, [filterContact, contacts]);
 
   return (
     <>
