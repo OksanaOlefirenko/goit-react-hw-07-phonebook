@@ -2,9 +2,18 @@ import { Item, Button } from './ContactItem.styled';
 import PropTypes from 'prop-types';
 import { useDeleteContactMutation } from 'redux/contactsApi';
 import { Loader } from 'components/Loader';
+import { useEffect } from 'react';
+import toast from 'react-hot-toast';
 
 export const ContactItem = ({ id, name, number }) => {
-  const [deleteContact, { isLoading: isDeleting }] = useDeleteContactMutation();
+  const [deleteContact, { isLoading: isDeleting, isSuccess }] =
+    useDeleteContactMutation();
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success('Contact deleted');
+    }
+  }, [isSuccess]);
+
   return (
     <Item key={id}>
       <p>
@@ -15,7 +24,7 @@ export const ContactItem = ({ id, name, number }) => {
         onClick={() => deleteContact(id)}
         disabled={isDeleting}
       >
-        {isDeleting && <Loader size={12} />} Delete
+        {isDeleting && <Loader />} Delete
       </Button>
     </Item>
   );
@@ -25,5 +34,4 @@ ContactItem.propTypes = {
   id: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   number: PropTypes.string.isRequired,
-  onDelete: PropTypes.func.isRequired,
 };

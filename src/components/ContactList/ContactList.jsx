@@ -2,24 +2,32 @@ import { List } from './ContactList.styled';
 import { ContactItem } from '../ContactItem';
 import { useSelector } from 'react-redux';
 import { getFilter } from 'redux/contactsSlice';
-// import { useState } from 'react';
 import { useGetContactsQuery } from 'redux/contactsApi';
+import { Loader } from 'components/Loader';
 
 export const ContactList = () => {
-  const { data, error, isFetching } = useGetContactsQuery();
-  console.log(data, error, isFetching);
-  // const contacts = useSelector(getContacts);
+  const { data: contacts, error, isLoading } = useGetContactsQuery();
+
   const filterContact = useSelector(getFilter);
 
-  const visibleContacts = data.filter(contact =>
-    contact.name.toLowerCase().includes(filterContact.toLowerCase())
-  );
+  const visibleContacts = filterContact
+    ? contacts.filter(({ name }) =>
+        name.toLowerCase().includes(filterContact.toLowerCase())
+      )
+    : contacts;
 
   return (
-    <List>
-      {visibleContacts.map(({ id, name, number }) => (
-        <ContactItem key={id} name={name} number={number} id={id} />
-      ))}
-    </List>
+    <>
+      {error && <p>Contacts not found</p>}
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <List>
+          {visibleContacts?.map(({ id, name, phone }) => (
+            <ContactItem key={id} name={name} number={phone} id={id} />
+          ))}
+        </List>
+      )}
+    </>
   );
 };
